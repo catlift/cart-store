@@ -9,7 +9,7 @@
         </div>
 
         <div class="payment">
-            <el-button round @click="payment">结算</el-button>
+            <el-button round @click="payment">结算({{total}})</el-button>
         </div>
     </div>
 </template>
@@ -23,7 +23,7 @@
         },
         data() {
             return {
-                checkAll: this.goodsState
+                checkAll: this.fullState
             }
         },
         methods: {
@@ -32,15 +32,24 @@
             },
             payment() {
                 alert("别买了，都穷到吃不了饭了！")
+            },
+            changeCheckAll() {
+                console.log(this.fullState)
+                this.checkAll = this.fullState
             }
         },
         computed: {
-            goodsState() {
-                return this.goods.every(item => item.goods_state)
+            fullState() {
+                const goodsAllState = this.goods.every(item => item.goods_state);
+                
+                return goodsAllState
+            },
+            total() {
+                return this.goods.filter(item => item.goods_state).reduce((total, item) => total += item.goods_count, 0)
             },
             goodsPrice() {
                 return this.goods.filter(item => item.goods_state).reduce((total, item) => total += item.goods_price * item.goods_count, 0)
-            }
+            },
         },
         filters: {
             // 将价格保留两位小数点
@@ -49,8 +58,11 @@
             }
         },
         watch: {
-            goodsState(newVal) {
-                this.checkAll = newVal
+            fullState: {
+                handler(newVal) {
+                    this.checkAll = newVal
+                },
+                immediate: true
             }
         }
     }
